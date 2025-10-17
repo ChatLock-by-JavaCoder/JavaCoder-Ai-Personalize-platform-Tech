@@ -42,9 +42,13 @@ export const Navbar = () => {
           <Link to="/exams">
             <Button variant="ghost">Exams</Button>
           </Link>
+
           <Link to="/leaderboard">
             <Button variant="ghost">Leaderboard</Button>
           </Link>
+
+          <Link to="/admin"> <Button variant="ghost">Admin</Button></Link>
+
 
           {session ? (
             <>
