@@ -38,67 +38,86 @@ const Admin = () => {
   }, []);
 
   const checkAdminAccess = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    if (!user) {
-      navigate("/auth");
-      return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        navigate("/auth");
+        return;
+      }
+
+      // FIX: Remove .single() and check array length
+      const { data, error } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "admin");
+
+      if (error || !data || data.length === 0) {
+        toast.error("Access denied. Admin privileges required.");
+        navigate("/");
+        return;
+      }
+
+      setIsAdmin(true);
+    } catch (error) {
+      console.error("Error checking admin access:", error);
+      toast.error("Error verifying admin access");
+    } finally {
+      setLoading(false);
     }
-
-    const { data, error } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id)
-      .eq("role", "admin")
-      .single();
-
-    if (error || !data) {
-      toast.error("Access denied. Admin privileges required.");
-      navigate("/");
-      return;
-    }
-
-    setIsAdmin(true);
-    setLoading(false);
   };
 
   const handleCreateExam = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreating(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("User not authenticated");
+        return;
+      }
 
-    const { error } = await supabase
-      .from("exams")
-      .insert([{
-        title,
-        description,
-        start_time: startTime,
-        end_time: endTime,
-        duration_minutes: parseInt(duration),
-        total_marks: parseInt(totalMarks),
-        exam_type: examType,
-        status: status as any,
-        created_by: user.id,
-      }]);
+      // FIX: Convert datetime-local to ISO string
+      const startTimeISO = new Date(startTime).toISOString();
+      const endTimeISO = new Date(endTime).toISOString();
 
-    if (error) {
-      console.error("Error creating exam:", error);
-      toast.error("Failed to create exam");
-    } else {
-      toast.success("Exam created successfully!");
-      // Reset form
-      setTitle("");
-      setDescription("");
-      setStartTime("");
-      setEndTime("");
-      setDuration("");
-      setTotalMarks("");
-      setExamType("");
-      setStatus("draft");
+      const { error } = await supabase
+        .from("exams")
+        .insert([{
+          title,
+          description,
+          start_time: startTimeISO,
+          end_time: endTimeISO,
+          duration_minutes: parseInt(duration),
+          total_marks: parseInt(totalMarks),
+          exam_type: examType,
+          status: status as any,
+          created_by: user.id,
+        }]);
+
+      if (error) {
+        console.error("Error creating exam:", error);
+        toast.error(`Failed to create exam: ${error.message}`);
+      } else {
+        toast.success("Exam created successfully!");
+        // Reset form
+        setTitle("");
+        setDescription("");
+        setStartTime("");
+        setEndTime("");
+        setDuration("");
+        setTotalMarks("");
+        setExamType("");
+        setStatus("draft");
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
   };
 
   if (loading) {
@@ -116,6 +135,7 @@ const Admin = () => {
     return null;
   }
 
+  // ALL YOUR EXISTING COMPONENT RENDERING CODE STAYS EXACTLY THE SAME
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
