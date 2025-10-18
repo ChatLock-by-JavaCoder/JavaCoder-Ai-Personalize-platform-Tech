@@ -44,7 +44,7 @@ export const Navbar = () => {
           </Link>
 
           <Link to="/leaderboard">
-            <Button variant="ghost">Leaderboard</Button>
+            {/* <Button variant="ghost">Leaderboard</Button> */}
           </Link>
 
           <Link to="/admin"> <Button variant="ghost">Admin</Button></Link>
