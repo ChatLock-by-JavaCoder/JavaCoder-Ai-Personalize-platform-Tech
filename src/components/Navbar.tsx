@@ -43,8 +43,8 @@ export const Navbar = () => {
             <Button variant="ghost">Exams</Button>
           </Link>
 
-          <Link to="/leaderboard">
-            {/* <Button variant="ghost">Leaderboard</Button> */}
+          <Link to="/javacoder-projects">
+            <Button variant="ghost">Youtube</Button>
           </Link>
 
           <Link to="/admin"> <Button variant="ghost">Admin</Button></Link>

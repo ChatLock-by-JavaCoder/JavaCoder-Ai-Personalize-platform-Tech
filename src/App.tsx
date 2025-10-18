@@ -13,6 +13,7 @@ import AdminUsers from "./pages/AdminUsers";
 import NotFound from "./pages/NotFound";
 import ExamInterface from "./pages/ExamInterface";
 import PrivacyPolicy from "./pages/Privacypolicy";
+import TutorialsPage from "./pages/TutorialsPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +33,8 @@ const App = () => (
           <Route path="/admin/users" element={<AdminUsers />} />
                     <Route path="/exam/:examId" element={<ExamInterface />} />
                     <Route path="/privacy" element={<PrivacyPolicy/>} />
+                    <Route path="/javacoder-projects" element={<TutorialsPage></TutorialsPage>} />
+
                     {/* <Route path="/terms" element={<TermsAndConditions/>} /> */}
 
           <Route path="*" element={<NotFound />} />
